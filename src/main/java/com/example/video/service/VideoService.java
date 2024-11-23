@@ -1,17 +1,22 @@
 package com.example.video.service;
 
 import com.example.video.dto.VideoInfo;
-import com.example.video.dto.VideoRequest;
+import com.example.video.dto.CreateVideoRequestDto;
 import com.example.video.entity.Video;
+import com.example.video.exception.NotFoundException;
 import com.example.video.repository.VideoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class VideoService {
@@ -23,20 +28,43 @@ public class VideoService {
     public List<VideoInfo> getAllVideo() {
         List<Video> videos = videoRepository.findAll();
         return videos.stream()
-                .map(video -> new VideoInfo(video.getId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle()))
-                .collect(Collectors.toList());
+            .map(video -> new VideoInfo(video.getVideoId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle()))
+            .collect(Collectors.toList());
     }
 
-    public VideoInfo createVideo(VideoRequest videoRequest) {
+    @Transactional
+    public VideoInfo createVideo(CreateVideoRequestDto videoRequest) {
+
+        // 1. 비디오만의 UUID 가져오기.
+        // 나중에 redis로 검증할거임 ㅋㅋ
+        String videoId = createUUID();
+
         Video video = Video.builder()
             .title(videoRequest.getTitle())
             .src(videoRequest.getSrc())
             .description(videoRequest.getDescription())
             .channelTitle(videoRequest.getChannelTitle())
+            .videoId(videoId)
             .build();
 
         Video savedVideo = videoRepository.save(video);
+        log.debug(savedVideo.toString());
 
-        return new VideoInfo(savedVideo.getId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle());
+        return new VideoInfo(savedVideo.getVideoId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle());
+    }
+
+    @Transactional
+    public VideoInfo getVideoByVideoId(String videoId) {
+        Optional<Video> video = videoRepository.findByVideoId(videoId);
+
+        if (video.isEmpty()) {
+            throw new NotFoundException("없다 이놈아 = ".concat(videoId));
+        }
+
+        return new VideoInfo(video);
+    }
+
+    public String createUUID() {
+        return UUID.randomUUID().toString();
     }
 }
