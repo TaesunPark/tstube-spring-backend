@@ -1,8 +1,9 @@
-package com.example.video.dto;
+package com.example.video.dto.video;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
-import com.example.video.entity.Video;
+import com.example.video.entity.video.Video;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +19,8 @@ public class VideoInfo {
     private String description;
     private long cnt;
     private String channelTitle;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 
     public VideoInfo (Optional<Video> video){
         this.videoId = video.get().getVideoId();
@@ -26,6 +29,8 @@ public class VideoInfo {
         this.description = video.get().getDescription();
         this.cnt = video.get().getCnt();
         this.channelTitle = video.get().getChannelTitle();
+        this.createTime = video.get().getCreateTime();
+        this.updateTime = video.get().getUpdateTime();
     }
 
 }

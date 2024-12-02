@@ -1,12 +1,13 @@
-package com.example.video.service;
+package com.example.video.service.video;
 
-import com.example.video.dto.VideoInfo;
-import com.example.video.dto.CreateVideoRequestDto;
-import com.example.video.entity.Video;
+import com.example.video.dto.video.CreateVideoRequestDto;
+import com.example.video.dto.video.VideoInfo;
+import com.example.video.entity.video.Video;
 import com.example.video.exception.NotFoundException;
-import com.example.video.repository.VideoRepository;
+import com.example.video.repository.video.VideoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,13 +29,12 @@ public class VideoService {
     public List<VideoInfo> getAllVideo() {
         List<Video> videos = videoRepository.findAll();
         return videos.stream()
-            .map(video -> new VideoInfo(video.getVideoId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle()))
+            .map(video -> new VideoInfo(video.getVideoId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle(), video.getCreateTime(), video.getUpdateTime()))
             .collect(Collectors.toList());
     }
 
     @Transactional
     public VideoInfo createVideo(CreateVideoRequestDto videoRequest) {
-
         // 1. 비디오만의 UUID 가져오기.
         // 나중에 redis로 검증할거임 ㅋㅋ
         String videoId = createUUID();
@@ -45,12 +45,14 @@ public class VideoService {
             .description(videoRequest.getDescription())
             .channelTitle(videoRequest.getChannelTitle())
             .videoId(videoId)
+            .createTime(LocalDateTime.now())
+            .updateTime(LocalDateTime.now())
             .build();
 
         Video savedVideo = videoRepository.save(video);
         log.debug(savedVideo.toString());
 
-        return new VideoInfo(savedVideo.getVideoId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle());
+        return new VideoInfo(savedVideo.getVideoId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle(), savedVideo.getCreateTime(), savedVideo.getUpdateTime());
     }
 
     @Transactional

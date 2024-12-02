@@ -1,4 +1,4 @@
-package com.example.video.dto;
+package com.example.video.dto.video;
 
 import lombok.Data;
 

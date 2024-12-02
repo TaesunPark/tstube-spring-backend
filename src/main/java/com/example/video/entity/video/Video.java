@@ -1,8 +1,7 @@
-package com.example.video.entity;
+package com.example.video.entity.video;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
-
-import org.hibernate.annotations.GenericGenerator;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -34,4 +33,6 @@ public class Video {
     private String description;
     private long cnt;
     private String channelTitle;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

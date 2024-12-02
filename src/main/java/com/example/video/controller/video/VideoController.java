@@ -1,20 +1,17 @@
-package com.example.video.controller;
+package com.example.video.controller.video;
 
-import com.example.video.dto.VideoInfo;
-import com.example.video.dto.CreateVideoRequestDto;
-import com.example.video.dto.VideoResponse;
+import com.example.video.dto.video.CreateVideoRequestDto;
+import com.example.video.dto.video.VideoInfo;
+import com.example.video.dto.video.VideoResponse;
 import com.example.video.response.ApiResponse;
-import com.example.video.service.VideoService;
+import com.example.video.service.video.VideoService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +30,7 @@ public class VideoController {
     private final VideoService videoService;
     // 1. video 전체 가져오는 api
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/videos")
-    public ApiResponse<List<VideoResponse>> getVideos(){
+    public ApiResponse<List<VideoResponse>> getVideos() {
         // 데이터베이스에서 전체 조회를 한다음 가져올거야
         // 응답 형식
         List<VideoInfo> videoInfos = videoService.getAllVideo();
@@ -45,24 +42,26 @@ public class VideoController {
                 videoInfo.getSrc(),
                 videoInfo.getDescription(),
                 videoInfo.getCnt(),
-                videoInfo.getChannelTitle()
+                videoInfo.getChannelTitle(),
+                videoInfo.getCreateTime(),
+                videoInfo.getUpdateTime()
             )).toList();
         return new ApiResponse<>(true, "Videos retrieved successfully", videoResponses);
     }
+
     // 2. 무한 스크롤 api
     // 3. 비디오를 하나 선택했을 때 api
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/video")
     public ApiResponse<VideoResponse> getVideoById(@RequestParam(value = "v", required = false) String videoId) {
         // videoId로 영상 가져오기
         VideoInfo videoInfo = videoService.getVideoByVideoId(videoId);
-        VideoResponse videoResponse = new VideoResponse(videoInfo.getVideoId(), videoInfo.getTitle(), videoInfo.getSrc(), videoInfo.getDescription(), videoInfo.getCnt(), videoInfo.getChannelTitle());
+        VideoResponse videoResponse = new VideoResponse(videoInfo.getVideoId(), videoInfo.getTitle(), videoInfo.getSrc(), videoInfo.getDescription(), videoInfo.getCnt(), videoInfo.getChannelTitle(), videoInfo.getCreateTime(), videoInfo.getUpdateTime());
         return new ApiResponse<>(true, videoId, videoResponse);
     }
 
-
     // 4. 비디오 등록 api
     @PostMapping(value = "/video")
-    public ResponseEntity<ApiResponse<VideoInfo>> createVideo(@RequestBody CreateVideoRequestDto videoRequest){
+    public ResponseEntity<ApiResponse<VideoInfo>> createVideo(@RequestBody CreateVideoRequestDto videoRequest) {
         VideoInfo createdVideo = videoService.createVideo(videoRequest);
         // 성공적인 응답 생성
         ApiResponse<VideoInfo> response = new ApiResponse<>(true, "Video created successfully", createdVideo);

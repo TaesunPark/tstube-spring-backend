@@ -1,9 +1,9 @@
-package com.example.video.repository;
+package com.example.video.repository.video;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import com.example.video.entity.Video;
+import com.example.video.entity.video.Video;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
