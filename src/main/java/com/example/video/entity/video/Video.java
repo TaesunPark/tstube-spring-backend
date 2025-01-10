@@ -33,6 +33,8 @@ public class Video {
     private String description;
     private long cnt;
     private String channelTitle;
+    private String type;
+    private String fileName;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
 }

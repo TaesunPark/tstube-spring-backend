@@ -12,7 +12,9 @@ public class VideoResponse {
 	private String title;
 	private String src;
 	private String description;
+	private String fileName;
 	private long cnt;
+	private String type;
 	private String channelTitle;
 	private LocalDateTime createTime;
 	private LocalDateTime updateTime;

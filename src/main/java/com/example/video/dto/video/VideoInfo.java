@@ -21,6 +21,8 @@ public class VideoInfo {
     private String channelTitle;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    private String type;
+    private String fileName;
 
     public VideoInfo (Optional<Video> video){
         this.videoId = video.get().getVideoId();
@@ -31,6 +33,8 @@ public class VideoInfo {
         this.channelTitle = video.get().getChannelTitle();
         this.createTime = video.get().getCreateTime();
         this.updateTime = video.get().getUpdateTime();
+        this.type = video.get().getType();
+        this.fileName = video.get().getFileName();
     }
 
 }

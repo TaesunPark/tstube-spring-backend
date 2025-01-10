@@ -41,7 +41,9 @@ public class VideoController {
                 videoInfo.getTitle(),
                 videoInfo.getSrc(),
                 videoInfo.getDescription(),
+                videoInfo.getFileName(),
                 videoInfo.getCnt(),
+                videoInfo.getType(),
                 videoInfo.getChannelTitle(),
                 videoInfo.getCreateTime(),
                 videoInfo.getUpdateTime()
@@ -55,7 +57,7 @@ public class VideoController {
     public ApiResponse<VideoResponse> getVideoById(@RequestParam(value = "v", required = false) String videoId) {
         // videoId로 영상 가져오기
         VideoInfo videoInfo = videoService.getVideoByVideoId(videoId);
-        VideoResponse videoResponse = new VideoResponse(videoInfo.getVideoId(), videoInfo.getTitle(), videoInfo.getSrc(), videoInfo.getDescription(), videoInfo.getCnt(), videoInfo.getChannelTitle(), videoInfo.getCreateTime(), videoInfo.getUpdateTime());
+        VideoResponse videoResponse = new VideoResponse(videoInfo.getVideoId(), videoInfo.getTitle(), videoInfo.getSrc(), videoInfo.getDescription(), videoInfo.getFileName(),videoInfo.getCnt(), videoInfo.getType(), videoInfo.getChannelTitle(), videoInfo.getCreateTime(), videoInfo.getUpdateTime());
         return new ApiResponse<>(true, videoId, videoResponse);
     }
 

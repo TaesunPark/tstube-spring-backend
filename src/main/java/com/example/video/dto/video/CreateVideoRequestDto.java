@@ -9,4 +9,6 @@ public class CreateVideoRequestDto {
 	private String src;
 	private String description;
 	private String channelTitle;
+	private String type;
+	private String fileName;
 }

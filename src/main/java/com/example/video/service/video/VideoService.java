@@ -29,7 +29,7 @@ public class VideoService {
     public List<VideoInfo> getAllVideo() {
         List<Video> videos = videoRepository.findAll();
         return videos.stream()
-            .map(video -> new VideoInfo(video.getVideoId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle(), video.getCreateTime(), video.getUpdateTime()))
+            .map(video -> new VideoInfo(video.getVideoId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle(), video.getCreateTime(), video.getUpdateTime(), video.getType(), video.getFileName()))
             .collect(Collectors.toList());
     }
 
@@ -47,12 +47,18 @@ public class VideoService {
             .videoId(videoId)
             .createTime(LocalDateTime.now())
             .updateTime(LocalDateTime.now())
+            .type(videoRequest.getType())
+            .fileName(videoRequest.getFileName())
             .build();
+
+        if (videoRequest.getType().equals("upload")) {
+            video.setFileName("%s_%s".formatted(videoId, ".mp4"));
+        }
 
         Video savedVideo = videoRepository.save(video);
         log.debug(savedVideo.toString());
 
-        return new VideoInfo(savedVideo.getVideoId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle(), savedVideo.getCreateTime(), savedVideo.getUpdateTime());
+        return new VideoInfo(savedVideo.getVideoId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle(), savedVideo.getCreateTime(), savedVideo.getUpdateTime(), savedVideo.getType(), savedVideo.getFileName());
     }
 
     @Transactional
