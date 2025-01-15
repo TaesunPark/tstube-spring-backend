@@ -3,12 +3,15 @@ package com.example.video.entity.video;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.*;
 
@@ -37,4 +40,9 @@ public class Video {
     private String fileName;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "thumbnail_id")
+    private Thumbnail thumbnail;
+
 }

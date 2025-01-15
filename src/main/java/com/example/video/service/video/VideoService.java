@@ -29,7 +29,7 @@ public class VideoService {
     public List<VideoInfo> getAllVideo() {
         List<Video> videos = videoRepository.findAll();
         return videos.stream()
-            .map(video -> new VideoInfo(video.getVideoId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle(), video.getCreateTime(), video.getUpdateTime(), video.getType(), video.getFileName()))
+            .map(video -> new VideoInfo(video.getVideoId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle(), video.getCreateTime(), video.getUpdateTime(), video.getType(), video.getFileName(), video.getThumbnail()))
             .collect(Collectors.toList());
     }
 
@@ -58,7 +58,7 @@ public class VideoService {
         Video savedVideo = videoRepository.save(video);
         log.debug(savedVideo.toString());
 
-        return new VideoInfo(savedVideo.getVideoId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle(), savedVideo.getCreateTime(), savedVideo.getUpdateTime(), savedVideo.getType(), savedVideo.getFileName());
+        return new VideoInfo(savedVideo.getVideoId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle(), savedVideo.getCreateTime(), savedVideo.getUpdateTime(), savedVideo.getType(), savedVideo.getFileName(), savedVideo.getThumbnail());
     }
 
     @Transactional

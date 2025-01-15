@@ -46,7 +46,8 @@ public class VideoController {
                 videoInfo.getType(),
                 videoInfo.getChannelTitle(),
                 videoInfo.getCreateTime(),
-                videoInfo.getUpdateTime()
+                videoInfo.getUpdateTime(),
+                videoInfo.getThumbnail() == null ? "" : videoInfo.getThumbnail().getUrl()
             )).toList();
         return new ApiResponse<>(true, "Videos retrieved successfully", videoResponses);
     }
@@ -57,16 +58,18 @@ public class VideoController {
     public ApiResponse<VideoResponse> getVideoById(@RequestParam(value = "v", required = false) String videoId) {
         // videoId로 영상 가져오기
         VideoInfo videoInfo = videoService.getVideoByVideoId(videoId);
-        VideoResponse videoResponse = new VideoResponse(videoInfo.getVideoId(), videoInfo.getTitle(), videoInfo.getSrc(), videoInfo.getDescription(), videoInfo.getFileName(),videoInfo.getCnt(), videoInfo.getType(), videoInfo.getChannelTitle(), videoInfo.getCreateTime(), videoInfo.getUpdateTime());
+        VideoResponse videoResponse = new VideoResponse(videoInfo.getVideoId(), videoInfo.getTitle(), videoInfo.getSrc(), videoInfo.getDescription(), videoInfo.getFileName(),videoInfo.getCnt(), videoInfo.getType(), videoInfo.getChannelTitle(), videoInfo.getCreateTime(), videoInfo.getUpdateTime(), videoInfo.getThumbnail() == null ? "" : videoInfo.getThumbnail().getUrl());
         return new ApiResponse<>(true, videoId, videoResponse);
     }
 
     // 4. 비디오 등록 api
     @PostMapping(value = "/video")
-    public ResponseEntity<ApiResponse<VideoInfo>> createVideo(@RequestBody CreateVideoRequestDto videoRequest) {
+    public ResponseEntity<ApiResponse<VideoResponse>> createVideo(@RequestBody CreateVideoRequestDto videoRequest) {
         VideoInfo createdVideo = videoService.createVideo(videoRequest);
         // 성공적인 응답 생성
-        ApiResponse<VideoInfo> response = new ApiResponse<>(true, "Video created successfully", createdVideo);
+        VideoResponse videoResponse = new VideoResponse(createdVideo);
+        ApiResponse<VideoResponse> response = new ApiResponse<>(true, "Video created successfully", videoResponse);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
     // 5. 비디오 삭제 api

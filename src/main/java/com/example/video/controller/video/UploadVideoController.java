@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.global.config.FileStorageProperties;
+import com.example.video.dto.video.UploadImageInfo;
 import com.example.video.dto.video.UploadVideoInfo;
 import com.example.video.response.ApiResponse;
 import com.example.video.service.video.UploadVideoService;
@@ -59,7 +60,19 @@ public class UploadVideoController {
 		}
 	}
 
-	@GetMapping(value = "/upload")
+	@PostMapping(value = "/upload/image")
+	public ResponseEntity<ApiResponse<UploadImageInfo>> createImage(@RequestParam("file") MultipartFile file, @RequestParam("videoId") String videoId) {
+		try {
+			String fileName = uploadVideoService.uploadImage(file, videoId);
+			UploadImageInfo uploadImageInfo = new UploadImageInfo(fileName, null);
+			ApiResponse<UploadImageInfo> response = new ApiResponse<>(true, "upload created successfully", uploadImageInfo);
+			return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		} catch (IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	@GetMapping(value = {"/upload", "/upload/images"})
 	public ResponseEntity<Resource> getVideo(@RequestParam String fileName) {
 		try {
 			// 비디오 파일 경로 설정
