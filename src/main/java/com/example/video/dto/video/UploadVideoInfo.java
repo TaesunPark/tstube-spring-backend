@@ -14,4 +14,5 @@ import lombok.Setter;
 public class UploadVideoInfo {
 	private String fileName;
 	private File videoFile;
+	private String videoId;
 }

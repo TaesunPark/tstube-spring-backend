@@ -35,7 +35,7 @@ public class UploadVideoService {
 	private VideoRepository videoRepository;
 
 	@Transactional
-	public String uploadVideo(MultipartFile file, String title) throws IOException {
+	public VideoInfo uploadVideo(MultipartFile file, String title) throws IOException {
 		Path uploadPath = Paths.get(fileStorageProperties.getUploadDir());
 		if (!Files.exists(uploadPath)) {
 			Files.createDirectories(uploadPath);
@@ -51,7 +51,7 @@ public class UploadVideoService {
 		VideoInfo videoInfo = videoService.createVideo(createVideoRequestDto);
 		Path filePath = uploadPath.resolve(fileName != null ? videoInfo.getFileName() : "?");
 		file.transferTo(filePath);
-		return fileName; // Return the file name or path for future use
+		return videoInfo; // Return the file name or path for future use
 	}
 
 	public File getVideo(String fileName) throws IOException {

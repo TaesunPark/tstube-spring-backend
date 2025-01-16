@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.global.config.FileStorageProperties;
 import com.example.video.dto.video.UploadImageInfo;
 import com.example.video.dto.video.UploadVideoInfo;
+import com.example.video.dto.video.VideoInfo;
 import com.example.video.response.ApiResponse;
 import com.example.video.service.video.UploadVideoService;
 
@@ -51,8 +52,8 @@ public class UploadVideoController {
 	@PostMapping(value = "/upload")
 	public ResponseEntity<ApiResponse<UploadVideoInfo>> createVideo(@RequestParam("file") MultipartFile file, @RequestParam("title") String title)  {
 		try {
-			String fileName = uploadVideoService.uploadVideo(file, title);
-			UploadVideoInfo uploadVideoInfo = new UploadVideoInfo(fileName, null);
+			VideoInfo videoInfo = uploadVideoService.uploadVideo(file, title);
+			UploadVideoInfo uploadVideoInfo = new UploadVideoInfo(videoInfo.getFileName(), null, videoInfo.getVideoId());
 			ApiResponse<UploadVideoInfo> response = new ApiResponse<>(true, "upload created successfully", uploadVideoInfo);
 			return ResponseEntity.status(HttpStatus.CREATED).body(response);
 		} catch (IOException e) {
