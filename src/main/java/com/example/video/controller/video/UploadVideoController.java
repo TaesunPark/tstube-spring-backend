@@ -78,7 +78,12 @@ public class UploadVideoController {
 		try {
 			// 비디오 파일 경로 설정
 			Path videoPath = Paths.get(fileStorageProperties.getUploadDir(), fileName);
+			Path imagePath = Paths.get(fileName);
 			Resource resource = new UrlResource(videoPath.toUri());
+			// 이미지 파일 경우
+			if (!resource.isReadable()) {
+				resource = new UrlResource(imagePath.toUri());
+			}
 
 			if (resource.exists() && resource.isReadable()) {
 				// MIME 타입 자동 감지
@@ -114,6 +119,7 @@ public class UploadVideoController {
 			case "mp3" -> MediaType.valueOf("audio/mpeg");
 			case "ogg" -> MediaType.valueOf("audio/ogg");
 			case "wav" -> MediaType.valueOf("audio/wav");
+			case "jpeg" -> MediaType.valueOf("image/jpeg");
 			default -> MediaType.APPLICATION_OCTET_STREAM; // 기본 값
 		};
 	}
