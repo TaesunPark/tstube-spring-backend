@@ -19,8 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
 		registry
 			.addMapping("/**")
 			.allowedOrigins(
+				"http://www.tstube.shop",
 				"http://www.xn----bv7eq1qhzbe7i6wn.shop", // 허용할 도메인 1
-				"http://localhost:3000"                  // 허용할 도메인 2
+				"http://localhost:3000"                  // 허용할 도메인 2,
 			)
 			.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 허용 메서드
 			.allowedHeaders("*")                                      // 허용 헤더
@@ -30,6 +31,9 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/upload/images/**").addResourceLocations("").addResourceLocations("file:/Users/taesunpark/dev/server/video-platform/upload/images/").setCachePeriod(3600);
+		// localhost
+		// registry.addResourceHandler("/upload/images/**").addResourceLocations("").addResourceLocations("file:/Users/taesunpark/dev/server/video-platform/upload/images/").setCachePeriod(3600);
+		// 배포
+		registry.addResourceHandler("/upload/images/**").addResourceLocations("").addResourceLocations("file:/upload/images").setCachePeriod(3600);
 	}
 }
