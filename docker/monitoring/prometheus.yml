@@ -6,4 +6,4 @@ scrape_configs:
     metrics_path: '/actuator/prometheus'
     scrape_interval: 5s
     static_configs:
-      - targets: ['local-spring:8081']
+      - targets: ['spring-container:8080']
