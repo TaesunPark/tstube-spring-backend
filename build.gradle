@@ -38,6 +38,15 @@ dependencies {
     implementation 'org.jboss.logging:jboss-logging:3.4.2.Final' // Use the latest version
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator:3.4.0'
+
+    // https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.14.3'
+
+
+
 }
 
 tasks.named('test') {

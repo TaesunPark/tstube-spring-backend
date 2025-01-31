@@ -1,0 +1,4 @@
+FROM prom/prometheus
+
+# 설정 파일 추가
+COPY prometheus.yml /etc/prometheus/prometheus.yml
