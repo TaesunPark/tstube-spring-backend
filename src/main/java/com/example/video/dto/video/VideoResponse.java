@@ -23,18 +23,4 @@ public class VideoResponse {
 	private LocalDateTime createTime;
 	private LocalDateTime updateTime;
 	private String thumbnailUrl;
-
-	public VideoResponse (VideoInfo videoInfo) {
-		videoId = videoInfo.getVideoId();
-		title = videoInfo.getTitle();
-		src = videoInfo.getSrc();
-		description = videoInfo.getDescription();
-		fileName = videoInfo.getFileName();
-		cnt = videoInfo.getCnt();
-		type = videoInfo.getType();
-		channelTitle = videoInfo.getChannelTitle();
-		createTime = videoInfo.getCreateTime();
-		updateTime = videoInfo.getUpdateTime();
-		thumbnailUrl = videoInfo.getThumbnail() == null ? "" : videoInfo.getThumbnail().getUrl();
-	}
 }

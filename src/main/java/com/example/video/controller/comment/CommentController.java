@@ -8,47 +8,40 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.video.dto.comment.CommentInfo;
+import com.example.video.dto.comment.CommentMapper;
 import com.example.video.dto.comment.CommentRequestDto;
 import com.example.video.dto.comment.CommentResponse;
-import com.example.video.dto.video.CreateVideoRequestDto;
-import com.example.video.dto.video.VideoInfo;
 import com.example.video.response.ApiResponse;
 import com.example.video.service.comment.CommentService;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@OpenAPIDefinition(info = @Info(title = "Video API", version = "1.0", description = "API for managing videos"))
 @RestController
+@RequestMapping("/api/v1/comments")
+@Tag(name = "Comment", description = "Comment Management API")
 @RequiredArgsConstructor
 public class CommentController {
 
 	private final CommentService commentService;
+	private final CommentMapper commentMapper;
 
-	// Comments
-	// content, createTime
-	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE, value = "/comments")
+	@Operation(summary = "Get comments by video ID")
+	@GetMapping
 	public ApiResponse<List<CommentResponse>> getComments(@RequestParam(value = "v", required = false) String videoId) {
-		List<CommentInfo> commentInfos = commentService.getCommentInfoList(videoId);
-
-		List<CommentResponse> commentResponses = commentInfos.stream().map(
-			commentInfo -> new CommentResponse(commentInfo.getVideoId(), commentInfo.getComment(), commentInfo.getCreateTime())
-		).toList();
-
-		return new ApiResponse<>(true, "Comments retrieved successfully", commentResponses);
+		return new ApiResponse<>(true, "Comments retrieved successfully", commentMapper.toResponseList(commentService.getCommentInfoList(videoId)));
 	}
 
-	@PostMapping(value = "/comment")
-	public ResponseEntity<ApiResponse<CommentInfo>> createComment(@RequestBody CommentRequestDto commentRequestDto) {
-		CommentInfo commentInfo = commentService.createComment(commentRequestDto);
-		// 성공적인 응답 생성
-		ApiResponse<CommentInfo> response = new ApiResponse<>(true, "Video created successfully", commentInfo);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	@Operation(summary = "Create new comment")
+	@PostMapping
+	public ApiResponse<CommentResponse> createComment(@Valid @RequestBody CommentRequestDto request) {
+		return new ApiResponse<>(true, "댓글 달기 성공", commentMapper.toResponse(commentService.createComment(request)));
 	}
 
 }
