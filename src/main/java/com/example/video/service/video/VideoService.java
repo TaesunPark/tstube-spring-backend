@@ -63,13 +63,10 @@ public class VideoService {
 
     @Transactional
     public VideoInfo getVideoByVideoId(String videoId) {
-        Optional<Video> video = videoRepository.findByVideoId(videoId);
+        Video video = videoRepository.findByVideoId(videoId)
+            .orElseThrow(() -> new NotFoundException(String.format("Video not found with videoId: %s", videoId)));
 
-        if (video.isEmpty()) {
-            throw new NotFoundException("없다 이놈아 = ".concat(videoId));
-        }
-
-        return new VideoInfo(video);
+        return new VideoInfo(Optional.ofNullable(video));
     }
 
     public String createUUID() {
