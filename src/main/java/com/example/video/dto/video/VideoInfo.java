@@ -7,11 +7,13 @@ import com.example.video.entity.video.Thumbnail;
 import com.example.video.entity.video.Video;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 public class VideoInfo {
     private String videoId;
