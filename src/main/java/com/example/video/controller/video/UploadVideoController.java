@@ -1,10 +1,11 @@
 package com.example.video.controller.video;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ContentDisposition;
@@ -23,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.global.config.FileStorageProperties;
 import com.example.video.dto.video.UploadImageResponse;
 import com.example.video.dto.video.UploadVideoResponse;
-import com.example.video.dto.video.VideoInfo;
+import com.example.video.dto.video.VideoMapper;
 import com.example.video.response.ApiResponse;
 import com.example.video.service.video.UploadVideoService;
 
@@ -37,35 +38,19 @@ public class UploadVideoController {
 
 	private final UploadVideoService uploadVideoService;
 	private final FileStorageProperties fileStorageProperties;
+	private final VideoMapper videoMapper;
 
 	@Operation(summary = "Upload video file")
 	@PostMapping(value = "/videos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ApiResponse<UploadVideoResponse> createVideo(@RequestParam("file") MultipartFile file, @RequestParam("title") String title)  {
-		try {
-			VideoInfo videoInfo = uploadVideoService.uploadVideo(file, title);
-			return new ApiResponse<>(true, "비디오 등록 성공", UploadVideoResponse.builder().videoId(videoInfo.getVideoId()).fileName(videoInfo.getFileName()).build());
-		} catch (IOException e) {
-			try {
-				throw new FileUploadException("Failed to upload video file", e);
-			} catch (FileUploadException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
+		return new ApiResponse<>(true, "비디오 등록 성공", videoMapper.toSimpleResponse(uploadVideoService.uploadVideo(file, title)));
 	}
 
 	@Operation(summary = "Upload thumbnail image")
 	@PostMapping(value = "/thumbnails", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ApiResponse<UploadImageResponse> createImage(@RequestParam("file") MultipartFile file, @RequestParam("videoId") String videoId) {
-		try {
-			String fileName = uploadVideoService.uploadImage(file, videoId);
-			return new ApiResponse<>(true, "썸네일 등록 성공", UploadImageResponse.builder().fileName(fileName).build());
-		} catch (IOException e) {
-			try {
-				throw new FileUploadException("Failed to upload thumbnail file", e);
-			} catch (FileUploadException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
+		String fileName = uploadVideoService.uploadImage(file, videoId);
+		return new ApiResponse<>(true, "썸네일 등록 성공", UploadImageResponse.builder().fileName(fileName).build());
 	}
 
 	@Operation(summary = "Get uploaded file")
@@ -85,9 +70,15 @@ public class UploadVideoController {
 				// MIME 타입 자동 감지
 				MediaType contentType = setMediaType(fileName);
 
+				// 파일명 인코딩 처리
+				String encodedFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8)
+					.replace("+", "%20");  // 공백 처리
+
 				// 응답 헤더 설정
 				HttpHeaders headers = new HttpHeaders();
-				headers.setContentDisposition(ContentDisposition.inline().filename(fileName).build());
+				headers.setContentDisposition(ContentDisposition.builder("inline")
+					.filename(encodedFileName, StandardCharsets.UTF_8)  // UTF-8 인코딩 적용
+					.build());
 				headers.setContentType(contentType);
 
 				return ResponseEntity.ok()
