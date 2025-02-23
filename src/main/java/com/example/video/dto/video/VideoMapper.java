@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import com.example.video.entity.video.Thumbnail;
-import com.example.video.entity.video.Video;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +28,13 @@ public class VideoMapper {
 			.thumbnailUrl(Optional.ofNullable(videoInfo.getThumbnail())
 				.map(Thumbnail::getUrl)
 				.orElse(""))
+			.build();
+	}
+
+	public UploadVideoResponse toSimpleResponse(VideoInfo uploadVideoInfo) {
+		return UploadVideoResponse.builder()
+			.videoId(uploadVideoInfo.getVideoId())
+			.fileName(uploadVideoInfo.getFileName())
 			.build();
 	}
 
