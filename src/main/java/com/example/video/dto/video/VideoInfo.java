@@ -8,12 +8,12 @@ import com.example.video.entity.video.Video;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-@Builder
+@Data
+@Builder(toBuilder = true)
 @AllArgsConstructor
 public class VideoInfo {
     private String videoId;
