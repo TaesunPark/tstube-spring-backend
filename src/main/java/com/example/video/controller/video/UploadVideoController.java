@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.global.annotation.RequiresControllerAuthentication;
 import com.example.global.config.FileStorageProperties;
+import com.example.user.entity.User;
 import com.example.video.dto.video.UploadImageResponse;
 import com.example.video.dto.video.UploadVideoResponse;
 import com.example.video.dto.video.VideoMapper;
@@ -42,8 +45,9 @@ public class UploadVideoController {
 
 	@Operation(summary = "Upload video file")
 	@PostMapping(value = "/videos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ApiResponse<UploadVideoResponse> createVideo(@RequestParam("file") MultipartFile file, @RequestParam("title") String title)  {
-		return new ApiResponse<>(true, "비디오 등록 성공", videoMapper.toSimpleResponse(uploadVideoService.uploadVideo(file, title)));
+	@RequiresControllerAuthentication
+	public ApiResponse<UploadVideoResponse> createVideo(@RequestParam("file") MultipartFile file, @RequestParam("title") String title, @AuthenticationPrincipal User user)  {
+		return new ApiResponse<>(true, "비디오 등록 성공", videoMapper.toSimpleResponse(uploadVideoService.uploadVideo(file, title, user)));
 	}
 
 	@Operation(summary = "Upload thumbnail image")

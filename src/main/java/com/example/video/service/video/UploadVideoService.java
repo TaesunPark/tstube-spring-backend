@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.global.annotation.RequiresServiceAuthentication;
 import com.example.global.config.FileStorageProperties;
+import com.example.user.entity.User;
 import com.example.video.dto.video.CreateVideoRequestDto;
 import com.example.video.dto.video.VideoInfo;
 import com.example.video.entity.video.Thumbnail;
@@ -31,10 +33,11 @@ public class UploadVideoService {
 	private VideoRepository videoRepository;
 
 	@Transactional
-	public VideoInfo uploadVideo(MultipartFile file, String title) {
+	@RequiresServiceAuthentication
+	public VideoInfo uploadVideo(MultipartFile file, String title, User user) {
 		validateFile(file);
 		String fileName = storeFile(file);
-		return createAndStoreVideo(file, fileName, title);
+		return createAndStoreVideo(file, fileName, title, user);
 	}
 
 	private void validateFile(MultipartFile file) {
@@ -64,7 +67,7 @@ public class UploadVideoService {
 		return uploadPath;
 	}
 
-	private VideoInfo createAndStoreVideo(MultipartFile file, String fileName, String title) {
+	private VideoInfo createAndStoreVideo(MultipartFile file, String fileName, String title, User user) {
 		try {
 			// 비디오 정보 생성
 			CreateVideoRequestDto createVideoRequestDto = CreateVideoRequestDto.builder()
@@ -75,7 +78,7 @@ public class UploadVideoService {
 				.build();
 
 			// 비디오 정보 저장
-			VideoInfo videoInfo = videoService.createVideo(createVideoRequestDto);
+			VideoInfo videoInfo = videoService.createVideo(createVideoRequestDto, user);
 
 			// 실제 파일 저장
 			Path uploadPath = createUploadDirectoryIfNotExists();

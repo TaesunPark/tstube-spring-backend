@@ -1,11 +1,14 @@
 package com.example.video.controller.video;
 
+import com.example.global.annotation.RequiresControllerAuthentication;
+import com.example.user.entity.User;
 import com.example.video.dto.video.CreateVideoRequestDto;
 import com.example.video.dto.video.VideoMapper;
 import com.example.video.dto.video.VideoResponse;
 import com.example.video.response.ApiResponse;
 import com.example.video.service.video.VideoService;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,8 +46,9 @@ public class VideoController {
 
     @Operation(summary = "Create new video")
     @PostMapping
-    public ApiResponse<VideoResponse> createVideo(@RequestBody @Valid CreateVideoRequestDto videoRequest) {
-        return new ApiResponse<>(true, "video 생성 성공", videoMapper.toResponse(videoService.createVideo(videoRequest)));
+    @RequiresControllerAuthentication
+    public ApiResponse<VideoResponse> createVideo(@RequestBody @Valid CreateVideoRequestDto videoRequest, @AuthenticationPrincipal User currentUser) {
+        return new ApiResponse<>(true, "video 생성 성공", videoMapper.toResponse(videoService.createVideo(videoRequest, currentUser)));
     }
     // 5. 비디오 삭제 api
     // 6. 비디오 정보 수정 api

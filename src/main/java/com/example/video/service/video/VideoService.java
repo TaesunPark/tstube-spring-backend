@@ -1,5 +1,7 @@
 package com.example.video.service.video;
 
+import com.example.global.annotation.RequiresServiceAuthentication;
+import com.example.user.entity.User;
 import com.example.video.dto.video.CreateVideoRequestDto;
 import com.example.video.dto.video.VideoInfo;
 import com.example.video.entity.video.Video;
@@ -34,7 +36,8 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoInfo createVideo(CreateVideoRequestDto videoRequest) {
+    @RequiresServiceAuthentication
+    public VideoInfo createVideo(CreateVideoRequestDto videoRequest, User user) {
         // 1. 비디오만의 UUID 가져오기.
         // 나중에 redis로 검증할거임 ㅋㅋ
         String videoId = createUUID();
@@ -49,6 +52,7 @@ public class VideoService {
             .updateTime(LocalDateTime.now())
             .type(videoRequest.getType())
             .fileName(videoRequest.getFileName())
+            .user(user)
             .build();
 
         if (videoRequest.getType().equals("upload")) {
