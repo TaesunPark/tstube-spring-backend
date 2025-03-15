@@ -13,49 +13,49 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.example.security.jwt.JwtAuthenticationFilter;
 import com.example.security.oauth.CustomOAuth2UserService;
+import com.example.security.oauth.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.example.security.oauth.OAuth2AuthenticationFailureHandler;
 import com.example.security.oauth.OAuth2SuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 
-// 스프링의 설정 클래스임을 나타내는 어노테이션
 @Configuration
-// 스프링 시큐리티 설정을 활성화하는 어노테이션
 @EnableWebSecurity
-// final 필드에 생성자를 자동으로 만들어주는 롬복 어노테이션
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	// OAuth2 사용자 정보를 처리하는 서비스 주입
 	private final CustomOAuth2UserService customOAuth2UserService;
-	// 인증 성공 핸들러 주입
 	private final OAuth2SuccessHandler oAuth2SuccessHandler;
-	// 인증 실패 핸들러 주입
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
-
-	// 스프링 시큐리티의 필터 체인을 구성하는 메서드
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 			.cors(cors -> cors.configure(http))
-			// CSRF (Cross-Site Request Forgery)  보안 기능 비활성화
 			.csrf(AbstractHttpConfigurer::disable)
-			// 세션을 생성하지 않고 상태를 저장하지 않음 (JWT 사용함)
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			// OAuth2 인증 과정에서는 상태를 유지해야 하므로 STATELESS 대신 ALWAYS 사용
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
 			.authorizeHttpRequests(auth -> auth
-				// .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()
+				.requestMatchers("/actuator/**").permitAll()
+				.requestMatchers("/auth/**", "/login/**", "/login/oauth2/code/*").permitAll()
 				.anyRequest().permitAll()
 			)
-		.oauth2Login(oAuth2Login ->
-			oAuth2Login.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+			.oauth2Login(oauth2 -> oauth2
+				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
 				.successHandler(oAuth2SuccessHandler)
 				.failureHandler(oAuth2AuthenticationFailureHandler)
-				.authorizationEndpoint(endpoint -> endpoint.baseUri("/auth/login"))
-		)
-
-		.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+				.authorizationEndpoint(endpoint -> endpoint
+					.baseUri("/auth/login")
+					.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository)
+				)
+				.redirectionEndpoint(redirection -> redirection
+					.baseUri("/login/oauth2/code/*")
+				)
+			)
+			// JWT 필터는 OAuth2 인증 후에 적용
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
@@ -64,5 +64,4 @@ public class SecurityConfig {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-
 }
