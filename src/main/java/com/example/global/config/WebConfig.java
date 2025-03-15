@@ -19,6 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
 		registry
 			.addMapping("/**")
 			.allowedOrigins(
+				"https://tstube.shop",
+				"https://www.tstube.shop",
+				"http://tstube.shop",
 				"http://www.tstube.shop",
 				"http://www.xn----bv7eq1qhzbe7i6wn.shop", // 허용할 도메인 1
 				"http://localhost:3000"                  // 허용할 도메인 2,
