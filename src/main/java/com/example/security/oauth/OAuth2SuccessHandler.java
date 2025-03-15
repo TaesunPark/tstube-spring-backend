@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.security.jwt.JwtTokenProvider;
+import com.example.security.CookieUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.Cookie;
@@ -23,6 +24,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final ObjectMapper objectMapper;
+	private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -38,10 +40,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		String token = jwtTokenProvider.createToken(providerId, "KAKAO", nickname);
 
 		// 프론트엔드 리다이렉트 URL 생성 및 토큰을 쿼리 파라미터로 전달
-		String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth/callback").queryParam("token", token).build().toUriString();
-
+		String targetUrl = UriComponentsBuilder.fromUriString("http://www.tstube.shop/oauth/callback").queryParam("token", token).build().toUriString();
+		// String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth/callback").queryParam("token", token).build().toUriString();
 		// HTTP 응답 헤더에 JWT 토큰 추가
-		response.setHeader("Authorization", String.format("Bearer {s}", token));
+		response.setHeader("Authorization", String.format("Bearer %s", token));
 
 		// JWT 토큰을 저장할 쿠키 생성
 		Cookie cookie = new Cookie("auth_token", token);
@@ -53,9 +55,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		cookie.setMaxAge(24 * 60 * 60);
 		response.addCookie(cookie);
 
+		// 인증 관련 쿠키 정리
+		clearAuthenticationAttributes(request, response);
+
 		// 사용자를 프론트엔드의 콜백 URL로 리다이렉트합니다.
 		getRedirectStrategy().sendRedirect(request, response, targetUrl);
+	}
 
+	protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
+		super.clearAuthenticationAttributes(request);
+		httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
 	}
 
 	public String setNicknameFromKakao(OAuth2User oAuth2User) {

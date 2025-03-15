@@ -3,22 +3,31 @@ package com.example.security.oauth;
 import java.io.IOException;
 
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
-public class OAuth2AuthenticationFailureHandler implements AuthenticationFailureHandler {
+@RequiredArgsConstructor
+public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
+
+	private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException exception) throws IOException, ServletException {
-		String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/login")
-				.queryParam("error", exception.getMessage())
-				.build().toUriString();
+
+		// 실패 시 OAuth2 인증 요청 쿠키 정리
+		httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+
+		String targetUrl = UriComponentsBuilder.fromUriString("http://www.tstube.shop/login")
+			.queryParam("error", exception.getMessage())
+			.build().toUriString();
 
 		response.sendRedirect(targetUrl);
 	}
