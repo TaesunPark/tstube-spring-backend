@@ -27,19 +27,36 @@ public class VideoInfo {
     private String type;
     private String fileName;
     private Thumbnail thumbnail;
+    private boolean isFavorite;
 
-    public VideoInfo (Optional<Video> video){
-        this.videoId = video.get().getVideoId();
-        this.title = video.get().getTitle();
-        this.src = video.get().getSrc();
-        this.description = video.get().getDescription();
-        this.cnt = video.get().getCnt();
-        this.channelTitle = video.get().getChannelTitle();
-        this.createTime = video.get().getCreateTime();
-        this.updateTime = video.get().getUpdateTime();
-        this.type = video.get().getType();
-        this.fileName = video.get().getFileName();
-        this.thumbnail = video.get().getThumbnail();
+    public VideoInfo (Video video){
+        this.videoId = video.getVideoId();
+        this.title = video.getTitle();
+        this.src = video.getSrc();
+        this.description = video.getDescription();
+        this.cnt = video.getCnt();
+        this.channelTitle = video.getChannelTitle();
+        this.createTime = video.getCreateTime();
+        this.updateTime = video.getUpdateTime();
+        this.type = video.getType();
+        this.fileName = video.getFileName();
+        this.thumbnail = video.getThumbnail();
     }
+
+    public VideoInfo (Video video, boolean isFavorite){
+        this.videoId = video.getVideoId();
+        this.title = video.getTitle();
+        this.src = video.getSrc();
+        this.description = video.getDescription();
+        this.cnt = video.getCnt();
+        this.channelTitle = video.getChannelTitle();
+        this.createTime = video.getCreateTime();
+        this.updateTime = video.getUpdateTime();
+        this.type = video.getType();
+        this.fileName = video.getFileName();
+        this.thumbnail = video.getThumbnail();
+        this.isFavorite = isFavorite;
+    }
+
 
 }

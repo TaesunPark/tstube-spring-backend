@@ -4,9 +4,12 @@ import com.example.global.annotation.RequiresServiceAuthentication;
 import com.example.user.entity.User;
 import com.example.video.dto.video.CreateVideoRequestDto;
 import com.example.video.dto.video.VideoInfo;
+import com.example.video.dto.video.VideoMapper;
 import com.example.video.entity.video.Video;
 import com.example.video.exception.NotFoundException;
 import com.example.video.repository.video.VideoRepository;
+import com.example.video.service.favorite.FavoriteService;
+
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,13 +28,13 @@ import lombok.extern.log4j.Log4j2;
 public class VideoService {
 
     private final VideoRepository videoRepository;
-
+    private final FavoriteService favoriteService;
+    private final VideoMapper videoMapper;
     // 데이터베이스에서 전체 조회하는 기능
     @Transactional
     public List<VideoInfo> getAllVideo() {
-        List<Video> videos = videoRepository.findAll();
-        return videos.stream()
-            .map(video -> new VideoInfo(video.getVideoId(), video.getTitle(), video.getSrc(), video.getDescription(), video.getCnt(), video.getChannelTitle(), video.getCreateTime(), video.getUpdateTime(), video.getType(), video.getFileName(), video.getThumbnail()))
+        return videoRepository.findAll().stream()
+            .map(VideoInfo::new)  // VideoInfo 생성자를 사용
             .collect(Collectors.toList());
     }
 
@@ -62,15 +65,20 @@ public class VideoService {
         Video savedVideo = videoRepository.save(video);
         log.debug(savedVideo.toString());
 
-        return new VideoInfo(savedVideo.getVideoId(), savedVideo.getTitle(), savedVideo.getSrc(), savedVideo.getDescription(), savedVideo.getCnt(), savedVideo.getChannelTitle(), savedVideo.getCreateTime(), savedVideo.getUpdateTime(), savedVideo.getType(), savedVideo.getFileName(), savedVideo.getThumbnail());
+        return new VideoInfo(savedVideo);
     }
 
     @Transactional
-    public VideoInfo getVideoByVideoId(String videoId) {
+    public VideoInfo getVideoByVideoId(String videoId, User user) {
         Video video = videoRepository.findByVideoId(videoId)
             .orElseThrow(() -> new NotFoundException(String.format("Video not found with videoId: %s", videoId)));
+        boolean isFavorite = false;
 
-        return new VideoInfo(Optional.ofNullable(video));
+        if (user != null) {
+            // 즐겨찾기 id인지 확인
+            isFavorite = favoriteService.existsByUserFavorite(user, video);
+        }
+        return new VideoInfo(video, isFavorite);
     }
 
     public String createUUID() {
