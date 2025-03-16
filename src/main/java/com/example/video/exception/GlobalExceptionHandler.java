@@ -65,4 +65,11 @@ public class GlobalExceptionHandler {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 	}
 
+	@ExceptionHandler(AlreadyExistsException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ResponseEntity<ApiResponse<String>> handleAlreadyExistsException(AlreadyExistsException e) {
+		ApiResponse<String> response = new ApiResponse<>(false, e.getMessage(), null);
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+	}
+
 }

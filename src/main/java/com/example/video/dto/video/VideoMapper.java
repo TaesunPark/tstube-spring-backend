@@ -28,6 +28,7 @@ public class VideoMapper {
 			.thumbnailUrl(Optional.ofNullable(videoInfo.getThumbnail())
 				.map(Thumbnail::getUrl)
 				.orElse(""))
+			.isFavorite(videoInfo.isFavorite())
 			.build();
 	}
 

@@ -34,14 +34,14 @@ public class VideoController {
 
     @Operation(summary = "Get all videos", description = "모든 비디오 조회")
     @GetMapping
-    public ApiResponse<List<VideoResponse>> getVideos() {
+    public ApiResponse<List<VideoResponse>> getVideos(@AuthenticationPrincipal User user) {
         return new ApiResponse<>(true, "Videos retrieved successfully", videoMapper.toResponseList(videoService.getAllVideo()));
     }
 
     @Operation(summary = "Get video by ID")
     @GetMapping("/{videoId}")
-    public ApiResponse<VideoResponse> getVideo(@PathVariable String videoId) {
-        return new ApiResponse<>(true, videoId, videoMapper.toResponse(videoService.getVideoByVideoId(videoId)));
+    public ApiResponse<VideoResponse> getVideo(@PathVariable String videoId, @AuthenticationPrincipal User user) {
+        return new ApiResponse<>(true, videoId, videoMapper.toResponse(videoService.getVideoByVideoId(videoId, user)));
     }
 
     @Operation(summary = "Create new video")

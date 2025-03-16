@@ -2,6 +2,8 @@ package com.example.video.dto.video;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,4 +25,6 @@ public class VideoResponse {
 	private LocalDateTime createTime;
 	private LocalDateTime updateTime;
 	private String thumbnailUrl;
+	@JsonProperty("isFavorite")
+	private boolean isFavorite;
 }

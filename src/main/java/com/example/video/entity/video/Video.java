@@ -27,7 +27,6 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
