@@ -35,8 +35,7 @@ public class SecurityConfig {
 		http
 			.cors(cors -> cors.configure(http))
 			.csrf(AbstractHttpConfigurer::disable)
-			// OAuth2 인증 과정에서는 상태를 유지해야 하므로 STATELESS 대신 ALWAYS 사용
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/actuator/**").permitAll()
 				.requestMatchers("/auth/**", "/login/**", "/login/oauth2/code/*").permitAll()
