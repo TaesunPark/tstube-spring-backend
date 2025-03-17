@@ -31,7 +31,7 @@ public class JwtTokenProvider {
 
 		Date now = new Date();
 		// 현재 시간 + 유효시간으로 만료시간 설정
-		Date validity = new Date(now.getTime() + jwtProperties.getTokenValidityInSeconds() * 1000);
+		Date validity = new Date(now.getTime() + jwtProperties.getTokenValidityInSeconds() * 10000);
 
 		return Jwts.builder()
 				.setClaims(claims)
