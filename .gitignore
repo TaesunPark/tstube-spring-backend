@@ -176,4 +176,5 @@ gradle-app.setting
 .DS_Store
 .idea
 /src/main/resources/application-oauth.properties
+/src/main/resources/application-database.properties
 .idea/
