@@ -2,6 +2,7 @@ package com.example.security.oauth;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
 	private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+	@Value("${app.server-url}")
+	private String server_url;
 
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
@@ -25,7 +28,7 @@ public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationF
 		// 실패 시 OAuth2 인증 요청 쿠키 정리
 		httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
 
-		String targetUrl = UriComponentsBuilder.fromUriString("http://www.tstube.shop/login")
+		String targetUrl = UriComponentsBuilder.fromUriString(String.format("%s/login", server_url))
 			.queryParam("error", exception.getMessage())
 			.build().toUriString();
 

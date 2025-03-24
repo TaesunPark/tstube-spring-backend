@@ -3,6 +3,7 @@ package com.example.security.oauth;
 import java.io.IOException;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.security.jwt.JwtTokenProvider;
-import com.example.security.CookieUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.Cookie;
@@ -25,6 +25,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final ObjectMapper objectMapper;
 	private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+	@Value("${app.server-url}")
+	private String server_url;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -40,8 +42,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		String token = jwtTokenProvider.createToken(providerId, "KAKAO", nickname);
 
 		// 프론트엔드 리다이렉트 URL 생성 및 토큰을 쿼리 파라미터로 전달
-		String targetUrl = UriComponentsBuilder.fromUriString("http://www.tstube.shop/oauth/callback").queryParam("token", token).build().toUriString();
-		// String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:3000/oauth/callback").queryParam("token", token).build().toUriString();
+		String targetUrl = UriComponentsBuilder.fromUriString(String.format("%s/oauth/callback", server_url)).queryParam("token", token).build().toUriString();
+
 		// HTTP 응답 헤더에 JWT 토큰 추가
 		response.setHeader("Authorization", String.format("Bearer %s", token));
 
