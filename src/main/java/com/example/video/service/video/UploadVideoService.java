@@ -22,9 +22,11 @@ import com.example.video.repository.video.VideoRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UploadVideoService {
 
 	private FileStorageProperties fileStorageProperties;
@@ -32,6 +34,9 @@ public class UploadVideoService {
 	private ThumbnailRepository thumbnailRepository;
 	private VideoRepository videoRepository;
 
+	/**
+	 * 비디오 파일 업로드 (기존 방식 - 단일 요청으로 업로드)
+	 */
 	@Transactional
 	@RequiresServiceAuthentication
 	public VideoInfo uploadVideo(MultipartFile file, String title, User user) {
@@ -104,6 +109,71 @@ public class UploadVideoService {
 		}
 	}
 
+	/**
+	 * 청크 업로드 완료 후 비디오 정보 저장
+	 */
+	@Transactional
+	@RequiresServiceAuthentication
+	public VideoInfo saveVideoFromChunks(String originalFileName, String title, User user) {
+		try {
+			// 비디오 정보 생성
+			CreateVideoRequestDto createVideoRequestDto = CreateVideoRequestDto.builder()
+				.type("upload")
+				.title(title)
+				.src(fileStorageProperties.getUploadDir())
+				.fileName(originalFileName)
+				.build();
+
+			// 비디오 정보 저장
+			VideoInfo videoInfo = videoService.createVideo(createVideoRequestDto, user);
+
+			log.info("청크 업로드 완료: videoId={}, fileName={}", videoInfo.getVideoId(), originalFileName);
+
+			return videoInfo;
+		} catch (Exception e) {
+			// 파일 저장 중 에러 발생 시 업로드된 파일 삭제
+			deleteFileIfExists(originalFileName);
+			throw new FileUploadException("비디오 정보 생성에 실패했습니다.", e);
+		}
+	}
+
+	/**
+	 * 임시 디렉토리 생성
+	 */
+	public Path createTempDirectoryIfNotExists() throws IOException {
+		Path tempPath = Paths.get(fileStorageProperties.getUploadDir(), "temp");
+		if (!Files.exists(tempPath)) {
+			Files.createDirectories(tempPath);
+		}
+		return tempPath;
+	}
+
+	/**
+	 * 임시 디렉토리 초기화 (애플리케이션 시작 시 호출)
+	 */
+	public void initTempDirectory() {
+		try {
+			// 임시 디렉토리 경로
+			Path tempDir = createTempDirectoryIfNotExists();
+
+			// 기존 임시 파일 정리
+			Files.list(tempDir)
+				.filter(path -> path.toString().endsWith(".part"))
+				.forEach(path -> {
+					try {
+						Files.delete(path);
+						log.info("임시 파일 삭제: {}", path);
+					} catch (IOException e) {
+						log.error("임시 파일 삭제 실패: {}", path, e);
+					}
+				});
+
+			log.info("임시 디렉토리 초기화 완료");
+		} catch (IOException e) {
+			log.error("임시 디렉토리 초기화 중 오류 발생", e);
+		}
+	}
+
 	@Transactional
 	public String uploadImage(MultipartFile file, String videoId) {
 		try {
@@ -151,5 +221,4 @@ public class UploadVideoService {
 
 		return filePath.toString();
 	}
-
 }
