@@ -1,13 +1,12 @@
 package com.example.chat.dto;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.springframework.web.socket.WebSocketSession;
 
-import com.example.chat.component.ChatRoomManager;
-import com.example.service.ChatService;
+import com.example.chat.entity.ChatMessage;
+import com.example.chat.service.ChatService;
 
 public class ChatRoom {
 	private final String roomId;
