@@ -218,7 +218,8 @@ public class UploadVideoController {
 			} else {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
+			log.error("비디오 스트리밍 오류: {}", e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}
@@ -232,7 +233,7 @@ public class UploadVideoController {
 		assert extension != null;
 
 		return switch (extension) {
-			case "mp4" -> MediaType.valueOf("video/mp4");
+			case "mp4" -> MediaType.parseMediaType("video/mp4");
 			case "avi" -> MediaType.valueOf("video/x-msvideo");
 			case "mp3" -> MediaType.valueOf("audio/mpeg");
 			case "ogg" -> MediaType.valueOf("audio/ogg");
